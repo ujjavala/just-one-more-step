@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 type Phase = "ask" | "loading" | "explain";
 type AlertToast = { id: number; text: string };
+const STATIC_MODE = process.env.NEXT_PUBLIC_STATIC_MODE === "true";
 
 const DOOMSDAY_ALERTS = [
   "Alert: Off-Syllabus Curiosity Detected",
@@ -48,20 +49,129 @@ function isTwoPlusTwoQuestion(value: string): boolean {
   return normalized === "2+2" || normalized === "whatis2+2" || normalized === "whatis2plus2";
 }
 
-async function postJson<T>(url: string, body?: object): Promise<T> {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined
-  });
+function repeatText(seed: string, count: number): string {
+  return Array.from({ length: count }, (_, idx) => `${seed} (${idx + 1})`).join("\n\n");
+}
 
-  const data = (await response.json()) as T & { error?: string };
-
-  if (!response.ok) {
-    throw new Error(data.error ?? `Request failed: ${response.status}`);
+function buildStaticExplain(question: string, extra?: string): string {
+  if (!isTwoPlusTwoQuestion(question)) {
+    return [
+      "Non-2+2 Request Detected",
+      "Your question has been routed to the Bureau of Unnecessary Complexity.",
+      repeatText(
+        "We are running this request through policy committees, executive approvals, and dramatic model choreography before clarity is legally allowed.",
+        18
+      ),
+      "Interim outcome: still almost there."
+    ].join("\n\n");
   }
 
-  return data;
+  const expansionLead = extra ? "Expanded Clarification Pack" : "Primary Clarification Pack";
+
+  return [
+    expansionLead,
+    "Short answer: 2+2 = 4.",
+    "Long answer: we assembled an enterprise pipeline to ensure this conclusion feels premium.",
+    repeatText(
+      "Our static-mode orchestration council confirms arithmetic stability while preserving ceremonial friction and inspirational over-explanation.",
+      extra ? 14 : 9
+    )
+  ].join("\n\n");
+}
+
+function staticPostJson<T>(url: string, body?: object): T {
+  const payload = (body ?? {}) as { question?: string; extra?: string };
+
+  if (url === "/api/loading") {
+    return {
+      messages: [
+        "Spinning up local static theatrics...",
+        "Calibrating unnecessary confidence layers...",
+        "Simulating cloud feelings without cloud costs...",
+        "Preparing final pre-final arithmetic confirmation..."
+      ]
+    } as T;
+  }
+
+  if (url === "/api/explain") {
+    return {
+      content: buildStaticExplain(payload.question ?? "What is 2+2?", payload.extra)
+    } as T;
+  }
+
+  if (url === "/api/terms") {
+    return {
+      terms: [
+        "By reading this clause you consent to additional clauses.",
+        "Completion is valid only after pre-completion confirmation.",
+        "Any direct answer may be delayed for theatrical quality.",
+        "All certainty is provisional pending one more step.",
+        "You may exit the modal, but not the process emotionally.",
+        "Clause 6 confirms Clause 6 remains self-referential.",
+        "Simplicity is disallowed under the Premium Friction Act.",
+        "All objections must be submitted in narrative form.",
+        "This agreement renews every time you scroll.",
+        "Final terms may be replaced by more final terms."
+      ]
+    } as T;
+  }
+
+  if (url === "/api/steps") {
+    return { step: "Reconfirm the confirmation strategy." } as T;
+  }
+
+  if (url === "/api/loop") {
+    return {
+      reason: "A final-static-validation mismatch was detected. One more ceremonial pass is required."
+    } as T;
+  }
+
+  if (url === "/api/widgets") {
+    return {
+      statuses: [
+        "Static mode: still overthinking confidently.",
+        "Local compliance team reviewing arithmetic posture.",
+        "No server detected. Drama continuity preserved."
+      ]
+    } as T;
+  }
+
+  throw new Error(`Unsupported static endpoint: ${url}`);
+}
+
+async function postJson<T>(url: string, body?: object): Promise<T> {
+  if (STATIC_MODE) {
+    return staticPostJson<T>(url, body);
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    });
+
+    const rawBody = await response.text();
+    let parsed: (T & { error?: string }) | null = null;
+
+    try {
+      parsed = JSON.parse(rawBody) as T & { error?: string };
+    } catch {
+      parsed = null;
+    }
+
+    if (!response.ok) {
+      return staticPostJson<T>(url, body);
+    }
+
+    if (!parsed) {
+      return staticPostJson<T>(url, body);
+    }
+
+    return parsed;
+  } catch {
+    return staticPostJson<T>(url, body);
+  }
 }
 
 function randomJump(value: number): number {
@@ -79,6 +189,7 @@ export default function HomePage() {
   const [debouncedQuestion, setDebouncedQuestion] = useState("What is 2+2?");
   const [activeQuestion, setActiveQuestion] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [statusNote, setStatusNote] = useState<string | null>(null);
 
   const [loadingMessages, setLoadingMessages] = useState<string[]>([
     "Booting 47 arithmetic oversight agents..."
@@ -94,6 +205,8 @@ export default function HomePage() {
   const [termsOpen, setTermsOpen] = useState(false);
   const [terms, setTerms] = useState<string[]>([]);
   const [termsLoading, setTermsLoading] = useState(false);
+  const [acceptingTerms, setAcceptingTerms] = useState(false);
+  const [escalationMode, setEscalationMode] = useState(false);
 
   const [loopReason, setLoopReason] = useState("");
   const [widgetLines, setWidgetLines] = useState<string[]>([
@@ -111,6 +224,18 @@ export default function HomePage() {
 
     return () => globalThis.clearTimeout(timeoutId);
   }, [question]);
+
+  useEffect(() => {
+    if (!statusNote) {
+      return;
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setStatusNote(null);
+    }, 3800);
+
+    return () => globalThis.clearTimeout(timeoutId);
+  }, [statusNote]);
 
   const isOffScopeQuestion = useMemo(() => {
     const liveValue = debouncedQuestion.trim();
@@ -219,6 +344,38 @@ export default function HomePage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!termsOpen || !escalationMode) {
+      return;
+    }
+
+    // Keep escalating forever while the modal is open.
+    void fetchTerms();
+    void fetchStepMessage();
+
+    const termsId = globalThis.setInterval(() => {
+      void fetchTerms();
+    }, 1350);
+
+    const stepId = globalThis.setInterval(() => {
+      void fetchStepMessage();
+    }, 1850);
+
+    const reasonId = globalThis.setInterval(() => {
+      void postJson<{ reason: string }>("/api/loop")
+        .then((data) => setLoopReason(data.reason))
+        .catch(() => {
+          setLoopReason("Escalation remains active. Completion remains denied.");
+        });
+    }, 2400);
+
+    return () => {
+      globalThis.clearInterval(termsId);
+      globalThis.clearInterval(stepId);
+      globalThis.clearInterval(reasonId);
+    };
+  }, [escalationMode, fetchStepMessage, fetchTerms, termsOpen]);
+
   const startFlow = useCallback(
     async (newQuestion: string, previousText?: string) => {
       setError(null);
@@ -258,6 +415,7 @@ export default function HomePage() {
   const handleStart = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
+      setStatusNote(null);
       const value = question.trim();
       if (!value) {
         setError("Ask something simple first.");
@@ -280,6 +438,7 @@ export default function HomePage() {
     setContinueBusy(true);
     setError(null);
     setTerms([]);
+    setEscalationMode(false);
     setTermsOpen(true);
     void fetchTerms();
 
@@ -310,6 +469,11 @@ export default function HomePage() {
   );
 
   const handleAcceptTerms = useCallback(async () => {
+    if (acceptingTerms) {
+      return;
+    }
+
+    setAcceptingTerms(true);
     setError(null);
 
     try {
@@ -318,15 +482,17 @@ export default function HomePage() {
       const loopData = await postJson<{ reason: string }>("/api/loop");
       setLoopReason(loopData.reason);
     } catch (acceptError) {
-      setError(acceptError instanceof Error ? acceptError.message : "Acceptance failed.");
-      return;
+      setLoopReason(
+        acceptError instanceof Error
+          ? acceptError.message
+          : "Acceptance acknowledged. One more ceremonial step is required."
+      );
     }
 
-    globalThis.setTimeout(() => {
-      setTermsOpen(false);
-      void startFlow(activeQuestion, explanations.join("\n\n"));
-    }, 2300);
-  }, [activeQuestion, explanations, fetchStepMessage, fetchTerms, startFlow]);
+    setStatusNote("Acceptance recorded. Infinite terms escalation is now active.");
+    setEscalationMode(true);
+    setAcceptingTerms(false);
+  }, [acceptingTerms, fetchStepMessage, fetchTerms]);
 
   return (
     <main>
@@ -417,6 +583,7 @@ export default function HomePage() {
             </div>
           </form>
           {error ? <p className="loop-note">{error}</p> : null}
+          {statusNote ? <p className="fine">{statusNote}</p> : null}
         </section>
 
         {phase === "loading" ? (
@@ -486,13 +653,19 @@ export default function HomePage() {
               ))}
             </ol>
             <div className="btn-row" style={{ marginTop: "0.9rem" }}>
-              <button className="btn btn-danger" type="button" onClick={handleAcceptTerms}>
-                Accept, Escalate, and Add More Terms
+              <button className="btn btn-danger" type="button" onClick={handleAcceptTerms} disabled={acceptingTerms}>
+                {acceptingTerms
+                  ? "Accepting And Escalating..."
+                  : escalationMode
+                    ? "Escalation Active: Add Even More Terms"
+                    : "Accept, Escalate, and Add More Terms"}
               </button>
               <button
                 className="btn btn-secondary"
                 type="button"
+                disabled={acceptingTerms}
                 onClick={() => {
+                  setEscalationMode(false);
                   setTermsOpen(false);
                   setLoopReason("You may close this modal, but the AI Agent Council never forgets.");
                 }}
@@ -501,6 +674,7 @@ export default function HomePage() {
               </button>
             </div>
             {termsLoading ? <p className="tagline">Generating more legally unnecessary clauses...</p> : null}
+            {escalationMode && latestStep ? <p className="loop-note">{`Mandatory additional step: ${latestStep}`}</p> : null}
             {loopReason ? <p className="loop-note">{`We are almost there. ${loopReason}`}</p> : null}
           </div>
         </div>

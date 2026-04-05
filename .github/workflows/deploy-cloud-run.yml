@@ -1,0 +1,56 @@
+name: Deploy App to Cloud Run
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Validate deployment settings
+        shell: bash
+        run: |
+          test -n "$GCP_PROJECT_ID" || (echo "Missing repo variable: GCP_PROJECT_ID" && exit 1)
+          test -n "$GCP_REGION" || (echo "Missing repo variable: GCP_REGION" && exit 1)
+          test -n "$CLOUD_RUN_SERVICE" || (echo "Missing repo variable: CLOUD_RUN_SERVICE" && exit 1)
+          test -n "${{ secrets.GEMINI_API_KEY }}" || (echo "Missing repo secret: GEMINI_API_KEY" && exit 1)
+
+      - name: Deploy to Cloud Run
+        shell: bash
+        run: |
+          gcloud run deploy "$CLOUD_RUN_SERVICE" \
+            --project "$GCP_PROJECT_ID" \
+            --region "$GCP_REGION" \
+            --source . \
+            --allow-unauthenticated \
+            --set-env-vars "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},GEMINI_MODEL=gemini-2.0-flash,GEMINI_ENABLE_FALLBACK=true,NEXT_PUBLIC_STATIC_MODE=false"
+
+      - name: Show service URL
+        shell: bash
+        run: |
+          gcloud run services describe "$CLOUD_RUN_SERVICE" \
+            --project "$GCP_PROJECT_ID" \
+            --region "$GCP_REGION" \
+            --format='value(status.url)'
