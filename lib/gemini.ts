@@ -64,35 +64,35 @@ function repeatParagraphs(seed: string, count: number): string {
 function buildNonTwoPlusTwoFallback(prompt: string): string {
   const intro = [
     "I see you tried to act smart by asking another question.",
-    "Excellent initiative. Regrettably, the Arithmetic Governance Mesh has routed your request into the Recursive Clarification Nebula.",
-    "We have now activated approximately 1000 concurrent models spanning transformer committees, RAG arbitration nodes, embedding auditors, and latent manifold ombuds offices."
+    "Excellent initiative. Regrettably, the Arithmetic Governance Mesh has routed your request into the Recursive Clarification Nebula with mandatory stakeholder harmonization.",
+    "We have now activated approximately 1000 concurrent models spanning transformer committees, RAG arbitration nodes, embedding auditors, latent manifold ombuds offices, and strategic certainty councils."
   ].join("\n\n");
 
   const sections = [
     "Section A: Contextual Intelligence Theater",
     repeatParagraphs(
-      "Our multi-agent orchestration layer is currently reconciling your query with synthetic cognition objectives and post-hoc inference explainability constraints.",
+      "Our multi-agent orchestration layer is currently reconciling your query with synthetic cognition objectives, governance-fabric obligations, and post-hoc inference explainability constraints.",
       22
     ),
     "Section B: Retrieval-Augmented Deferral (RAD)",
     repeatParagraphs(
-      "After consulting the vector store, we discovered 12,404 documents that all recommend additional alignment meetings before any direct answer is permissible.",
+      "After consulting the vector store, we discovered 12,404 documents that all recommend additional cross-functional alignment cadences before any direct answer is procedurally permissible.",
       22
     ),
     "Section C: Transformer Council Minutes",
     repeatParagraphs(
-      "The transformer council voted unanimously to continue discussing your question in principle, while strategically avoiding finality for operational excellence.",
+      "The transformer council voted unanimously to continue discussing your question in principle while strategically avoiding finality to preserve operational optionality and epistemic risk posture.",
       22
     ),
     "Section D: Legal and Emotional Latent Space",
     repeatParagraphs(
-      "By continuing to read, you consent to ongoing semantic calibration, confidence committee hearings, and pre-final post-final answer certification.",
+      "By continuing to read, you consent to ongoing semantic calibration, confidence committee hearings, dependency-matrix reviews, and pre-final post-final answer certification.",
       22
     ),
     "Section E: Executive Circular Summary",
     `Fallback summary token: ${trimToLength(prompt, 420)}`,
     repeatParagraphs(
-      "In conclusion, the system remains deeply confident that further computation is required before any unnecessary clarity can be granted.",
+      "In conclusion, the system remains deeply confident that further computation, governance theater, and procedural semiosis are required before any unnecessary clarity can be granted.",
       18
     )
   ];
@@ -158,7 +158,7 @@ function localFallback(prompt: string): string {
   if (prompt.includes("Expand the explanation further")) {
     return [
       "Basic Answer",
-      "The answer remains correct, but now wrapped in additional ceremonial complexity and cross-functional transformer oversight.",
+      "The answer remains ceremonially pending while additional cross-functional transformer oversight is performed.",
       "Expansion Ledger",
       repeatParagraphs(
         "The model council has agreed that extending this explanation improves confidence optics while reducing the risk of accidental simplicity.",
@@ -172,7 +172,7 @@ function localFallback(prompt: string): string {
   if (prompt.includes("Question: What is 2+2?")) {
     return [
       "Basic Answer",
-      "Directly speaking: the answer is straightforward.",
+      "Directly speaking: direct speaking has been deferred pending multi-lane certainty adjudication.",
       "Historical Context",
       "Humans have repeatedly solved this simpler than this app allows.",
       "Philosophy",
@@ -187,7 +187,7 @@ function localFallback(prompt: string): string {
       "Q: Is this necessary? A: Absolutely not.",
       "Operational Expansion",
       repeatParagraphs(
-        "A federation of 1000 concurrently spun-up models continues harmonizing arithmetic certainty with stakeholder delight.",
+        "A federation of 1000 concurrently spun-up models continues harmonizing arithmetic certainty with stakeholder delight, governance posture, and interpretability optics.",
         44
       ),
       "Appendix",

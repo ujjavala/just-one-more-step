@@ -34,7 +34,7 @@ Expand the existing explanation into an even longer and more ridiculous document
 - Keep the original sections and add new nested sub-sections
 - Include dramatic updates from imaginary AI agent departments (Compliance Agent, Risk Agent, Nostalgia Agent, Quantum Agent, HR Agent)
 - Include fake meeting minutes, escalation notes, and contradictory legal clauses
-- Maintain that the correct answer is still 4, but bury it under bureaucracy
+- Never provide a direct numerical conclusion; stay circular and ceremonial
 - Write at least 2000 words
 
 Existing context to expand:
@@ -52,6 +52,9 @@ Requirements:
 - Use heavy AI buzzwords: RAG, transformers, embeddings, multi-agent orchestration,
   latent space, chain-of-thought governance, inference routing, MoE, vector stores,
   synthetic eval harnesses, token economics
+- Use weaponized consultant jargon: stakeholder alignment, cross-functional cadence,
+  strategic north star, operationalization, governance fabric, confidence posture,
+  dependency matrix, value-stream harmonization
 - Keep going in circles and avoid truly answering the user's original question
 - Add sections, subsections, faux theorem references, and legal-ish disclaimers
 - Include a recurring line: "We are almost there. Just one more model."
@@ -64,7 +67,7 @@ ${body.extra}`;
       prompt = `Question: What is 2+2?
 
 Explain this in an extremely long, overly detailed, philosophical, legalistic, and absurd way for an April Fools app.
-Start with the correct answer (4), then progressively become theatrical and ridiculous.
+Do not provide a direct numerical answer. Progressively become theatrical, circular, and ridiculous.
 
 Required sections:
 1. Basic Answer
@@ -81,6 +84,9 @@ Style requirements:
 - Corporate SaaS tone colliding with nonsense
 - Include terms like "pre-final validation", "meta-approval", "agent swarm", "confidence committee"
 - Also include flashy AI buzzwords such as "RAG", "transformers", "embeddings", "vector database", "mixture-of-experts", and "multi-agent orchestration"
+- Add dense pseudo-intellectual jargon in every section and avoid plain English where possible
+- Prefer overcomplicated phrasing such as "epistemic risk surface", "procedural semiosis",
+  "organizational certainty gradient", and "post-decision interpretability theater"
 - Jokingly claim that around 1000 models were spun up concurrently just to answer 2+2
 - At least 2500 words`;
     } else {
@@ -97,6 +103,8 @@ Rules:
 - Speak in circles with fake confidence
 - Use many AI and deep learning terms (RAG, transformers, embeddings, agentic pipelines,
   retrieval layers, latent manifolds, synthetic cognition, inference graphs)
+- Add heavy enterprise-jargon nonsense and overcomplicated vocabulary in nearly every sentence
+- Sound like a board-deck crossed with a legal memo crossed with a model-card meltdown
 - Mention we deployed around 1000 concurrent models for this "analysis"
 - Include a lot of sections and formal-sounding nonsense
 - Repeat motif: "We are almost there. Just one more model."

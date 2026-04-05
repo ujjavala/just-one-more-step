@@ -88,9 +88,9 @@ function buildStaticExplain(question: string, extra?: string): string {
   if (!isTwoPlusTwoQuestion(question)) {
     return [
       "Non-2+2 Request Detected",
-      "Your question has been routed to the Bureau of Unnecessary Complexity.",
+      "Your question has been routed to the Bureau of Unnecessary Complexity and Strategic Optionality.",
       repeatText(
-        "We are running this request through policy committees, executive approvals, and dramatic model choreography before clarity is legally allowed.",
+        "We are running this request through policy committees, executive approvals, confidence-governance matrices, and dramatic model choreography before clarity is legally and ceremonially allowed.",
         18
       ),
       "Interim outcome: still almost there."
@@ -101,10 +101,10 @@ function buildStaticExplain(question: string, extra?: string): string {
 
   return [
     expansionLead,
-    "Short answer: 2+2 = 4.",
-    "Long answer: we assembled an enterprise pipeline to ensure this conclusion feels premium.",
+    "Short answer: the committee has postponed short answers pending semantic due diligence.",
+    "Long answer: we assembled an enterprise-grade inference pipeline to ensure certainty remains tastefully unresolved within governance tolerances.",
     repeatText(
-      "Our static-mode orchestration council confirms arithmetic stability while preserving ceremonial friction and inspirational over-explanation.",
+      "Our static-mode orchestration council confirms arithmetic stability while preserving ceremonial friction, stakeholder confidence optics, and inspirational over-explanation.",
       extra ? 14 : 9
     )
   ].join("\n\n");
