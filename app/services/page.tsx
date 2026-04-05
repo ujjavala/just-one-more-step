@@ -45,11 +45,12 @@ export default function ServicesPage() {
         <section className="panel about-manifesto">
           <p className="label">ROLLOUT PLAN</p>
           <p>
-            Phase 1: secure venture funding.
+            Phase 1: secure $1 trillion in venture funding before lunch.
             Phase 2: hire two more whiteboards.
             Phase 3: announce a roadmap full of words like "synergy", "agentic", and "velocity".
           </p>
           <p>
+            Long-term ambition: venture-fund Elon Musk, then politely teach him how to scale 2+2.
             The moment funding lands, we will proudly overcomplicate arithmetic at global scale.
           </p>
           <div className="btn-row">

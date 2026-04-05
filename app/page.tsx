@@ -1,11 +1,41 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { Orbit, PartyPopper, Radar, Siren, Sparkles, Target, TriangleAlert, Zap } from "lucide-react";
 
 type Phase = "ask" | "loading" | "explain";
 type AlertToast = { id: number; text: string };
+type SurpriseToast = { id: number; text: string };
 const STATIC_MODE = process.env.NEXT_PUBLIC_STATIC_MODE === "true";
 const ASSET_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+const SURPRISE_LINES = [
+  "Achievement unlocked: Intentional Overreaction",
+  "Chaos bonus activated: +3 unnecessary approvals",
+  "Audit orchestra applauds your curiosity",
+  "Secret mode enabled: Cinematic Bureaucracy",
+  "Compliance fireworks approved retroactively",
+  "Side quest received: reconcile the reconciler"
+];
+
+const PANIC_LINES = [
+  "Panic Event: The system became emotionally invested in your click.",
+  "Emergency Flash: Compliance confetti exceeded legal thresholds.",
+  "Alert: Your curiosity triggered an unnecessary cinematic sequence."
+];
+
+const KONAMI_SEQUENCE = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a"
+] as const;
 
 const DOOMSDAY_ALERTS = [
   "Alert: Off-Syllabus Curiosity Detected",
@@ -184,6 +214,16 @@ function advanceBars(values: number[]): number[] {
   return values.map(randomJump);
 }
 
+function pickSurpriseLine(): string {
+  return SURPRISE_LINES[Math.floor(Math.random() * SURPRISE_LINES.length)] ??
+    "Surprise registered. Please enjoy one more step.";
+}
+
+function pickPanicLine(): string {
+  return PANIC_LINES[Math.floor(Math.random() * PANIC_LINES.length)] ??
+    "Emergency theatrics enabled.";
+}
+
 export default function HomePage() {
   const [phase, setPhase] = useState<Phase>("ask");
   const [question, setQuestion] = useState("What is 2+2?");
@@ -217,6 +257,12 @@ export default function HomePage() {
   ]);
   const [alertIndex, setAlertIndex] = useState(0);
   const [doomsdayToasts, setDoomsdayToasts] = useState<AlertToast[]>([]);
+  const [surpriseToasts, setSurpriseToasts] = useState<SurpriseToast[]>([]);
+  const [cinemaFlash, setCinemaFlash] = useState(false);
+  const [panicOverlay, setPanicOverlay] = useState<string | null>(null);
+  const [prankLabels, setPrankLabels] = useState(false);
+  const [konamiMode, setKonamiMode] = useState(false);
+  const [keyTrail, setKeyTrail] = useState<string[]>([]);
 
   useEffect(() => {
     const timeoutId = globalThis.setTimeout(() => {
@@ -237,6 +283,76 @@ export default function HomePage() {
 
     return () => globalThis.clearTimeout(timeoutId);
   }, [statusNote]);
+
+  useEffect(() => {
+    if (!panicOverlay) {
+      return;
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setPanicOverlay(null);
+    }, 900);
+
+    return () => globalThis.clearTimeout(timeoutId);
+  }, [panicOverlay]);
+
+  useEffect(() => {
+    if (!prankLabels) {
+      return;
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setPrankLabels(false);
+    }, 1100);
+
+    return () => globalThis.clearTimeout(timeoutId);
+  }, [prankLabels]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      setKeyTrail((current) => {
+        const next = [...current, key].slice(-KONAMI_SEQUENCE.length);
+        const matched = KONAMI_SEQUENCE.every((item, idx) => next[idx] === item);
+        if (matched) {
+          setKonamiMode(true);
+          setStatusNote("Konami mode enabled: Maximum ceremonial chaos unlocked.");
+          setCinemaFlash(true);
+          globalThis.setTimeout(() => setCinemaFlash(false), 1400);
+        }
+        return next;
+      });
+    };
+
+    globalThis.addEventListener("keydown", onKeyDown);
+    return () => globalThis.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!konamiMode) {
+      return;
+    }
+
+    const burstId = globalThis.setInterval(() => {
+      const text = `Konami Chaos: ${pickSurpriseLine()}`;
+      setSurpriseToasts((current) => [
+        { id: Date.now() + Math.floor(Math.random() * 1000), text },
+        ...current
+      ].slice(0, 6));
+      setCinemaFlash((v) => !v);
+    }, 2200);
+
+    const timeoutId = globalThis.setTimeout(() => {
+      setKonamiMode(false);
+      setCinemaFlash(false);
+      setStatusNote("Konami mode expired. Standard absurdity restored.");
+    }, 18000);
+
+    return () => {
+      globalThis.clearInterval(burstId);
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, [konamiMode]);
 
   const isOffScopeQuestion = useMemo(() => {
     const liveValue = debouncedQuestion.trim();
@@ -458,8 +574,40 @@ export default function HomePage() {
     setAcceptingTerms(false);
   }, [fetchStepMessage, fetchTerms]);
 
+  const triggerSurprise = useCallback(() => {
+    const text = pickSurpriseLine();
+    const toast: SurpriseToast = { id: Date.now() + Math.floor(Math.random() * 1000), text };
+
+    setSurpriseToasts((current) => [toast, ...current].slice(0, 5));
+    setStatusNote(`${text}. Please remain calmly dramatic.`);
+
+    if (Math.random() > 0.45) {
+      setCinemaFlash(true);
+      globalThis.setTimeout(() => {
+        setCinemaFlash(false);
+      }, 1200);
+    }
+
+    if (Math.random() > 0.55) {
+      setPrankLabels(true);
+    }
+
+    if (Math.random() > 0.82) {
+      setPanicOverlay(pickPanicLine());
+    }
+  }, []);
+
   return (
-    <main>
+    <main className={`${cinemaFlash ? "cinema-flash" : ""} ${konamiMode ? "konami-mode" : ""}`.trim()}>
+      {panicOverlay ? (
+        <div className="panic-overlay" aria-live="assertive">
+          <div className="panic-overlay-card">
+            <TriangleAlert size={18} />
+            <span>{panicOverlay}</span>
+          </div>
+        </div>
+      ) : null}
+
       {isOffScopeQuestion ? (
         <section className="doomsday-layer" aria-live="assertive">
           <div className="alert-banner">
@@ -477,6 +625,9 @@ export default function HomePage() {
 
       <div className="main-wrap">
         <section className="hero">
+          <div className="hero-orbit hero-orbit-a" aria-hidden="true" />
+          <div className="hero-orbit hero-orbit-b" aria-hidden="true" />
+
           <div className="hero-logo-stage" aria-hidden="true">
             <img
               src={`${ASSET_BASE_PATH}/justonemorestep-logo-design.png`}
@@ -492,35 +643,59 @@ export default function HomePage() {
             <div className="hero-copy-center">
               <p className="label">THE ARITHMETIC EXPERIENCE CLOUD</p>
               <h1 className="brand">We Answer The Hardest Question: What Is 2+2?</h1>
-              <p className="tagline hero-lead">
-                Because simple answers are outdated. We understand your needs, then complicate them
-                with care.
+              <p className="hero-focus-banner">
+                <strong>ONE WORLD PROBLEM. ONE ANSWER.</strong>
+                <span> We solve 2+2. Ask anything else and compliance gets excited.</span>
               </p>
-              <p className="fine">Opposite of every website promise, now in enterprise edition.</p>
+              <p className="tagline hero-lead">
+                Very focused. Very disciplined. Very unwilling to expand scope.
+              </p>
+              <p className="fine">
+                We dare you: ask anything except 2+2 and watch the compliance sirens audition.
+              </p>
               <p className="loop-note">
-                Our mission: make basic things feel premium, layered, and mildly exhausting.
+                Our mission: reward obedience, punish creativity, and turn basic arithmetic into a
+                cinematic cautionary tale.
               </p>
               <div className="hero-pill-row" aria-hidden="true">
-                <span className="hero-pill">99.99% Additional Friction</span>
-                <span className="hero-pill">AI-First Delay Architecture</span>
-                <span className="hero-pill">Globally Distributed Overthinking</span>
+                <span className="hero-pill">
+                  <Target size={14} />
+                  99.99% Additional Friction
+                </span>
+                <span className="hero-pill">
+                  <Orbit size={14} />
+                  AI-First Delay Architecture
+                </span>
+                <span className="hero-pill">
+                  <Radar size={14} />
+                  Globally Distributed Overthinking
+                </span>
               </div>
             </div>
 
             <div className="hero-float-zone" aria-hidden="true">
-              <div className="hero-float-card hero-float-card-a">
+              <div className="hero-float-card hero-float-card-a" onClick={triggerSurprise} role="button" tabIndex={0}>
                 <p className="hero-float-kicker">Trust Metric</p>
-                <p className="hero-float-title">Complexity Index</p>
+                <p className="hero-float-title">
+                  <Sparkles size={14} />
+                  Complexity Index
+                </p>
                 <p className="hero-float-value">+742%</p>
               </div>
-              <div className="hero-float-card hero-float-card-b">
+              <div className="hero-float-card hero-float-card-b" onClick={triggerSurprise} role="button" tabIndex={0}>
                 <p className="hero-float-kicker">Average Journey</p>
-                <p className="hero-float-title">Steps To Reach 4</p>
+                <p className="hero-float-title">
+                  <Zap size={14} />
+                  Steps To Reach 4
+                </p>
                 <p className="hero-float-value">93</p>
               </div>
-              <div className="hero-float-card hero-float-card-c">
+              <div className="hero-float-card hero-float-card-c" onClick={triggerSurprise} role="button" tabIndex={0}>
                 <p className="hero-float-kicker">Customer Care</p>
-                <p className="hero-float-title">We Understand You</p>
+                <p className="hero-float-title">
+                  <Siren size={14} />
+                  We Understand You
+                </p>
                 <p className="hero-float-value">Eventually</p>
               </div>
             </div>
@@ -542,7 +717,11 @@ export default function HomePage() {
             />
             <div className="btn-row">
               <button className="btn btn-primary" type="submit" disabled={phase === "loading"}>
-                Summon Arithmetic Compliance Board
+                {prankLabels ? "Proceed Directly To Regret" : "Summon Arithmetic Compliance Board"}
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={triggerSurprise}>
+                <PartyPopper size={14} />
+                Do Not Click For Bonus Chaos
               </button>
             </div>
           </form>
@@ -586,7 +765,11 @@ export default function HomePage() {
             ) : null}
             <div className="btn-row">
               <button className="btn btn-secondary" type="button" onClick={handleContinue} disabled={continueBusy}>
-                {continueBusy ? "Continuing...Just One More Step" : ctaLabel}
+                {continueBusy
+                  ? "Continuing...Just One More Step"
+                  : prankLabels
+                    ? "Continue Anyway (Not Recommended)"
+                    : ctaLabel}
               </button>
             </div>
           </section>
@@ -600,6 +783,16 @@ export default function HomePage() {
           </div>
         ))}
       </aside>
+
+      {surpriseToasts.length ? (
+        <aside className="surprise-stack" aria-live="polite">
+          {surpriseToasts.map((toast) => (
+            <div key={toast.id} className="surprise-toast">
+              {toast.text}
+            </div>
+          ))}
+        </aside>
+      ) : null}
 
       {termsOpen ? (
         <div className="modal-backdrop">

@@ -12,7 +12,13 @@ export default function AboutPage() {
             mission-critical digital transformation strategy? The result is a platform that lovingly
             overthinks everything.
           </p>
-          <p className="fine">Built with confidence, powered by AI, approved by 14 committees.</p>
+          <p className="fine">
+            We dislike oversmartness. We prefer disciplined curiosity inside clearly labeled fences.
+          </p>
+          <p className="loop-note">
+            Ask what we dictate and you get polished chaos. Ask anything else and you unlock
+            theatrical consequences.
+          </p>
           <div className="hero-pill-row" aria-hidden="true">
             <span className="hero-pill">Human-ish</span>
             <span className="hero-pill">AI-Dependent</span>
